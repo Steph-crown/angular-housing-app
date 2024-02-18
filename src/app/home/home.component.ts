@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 import { CommonModule } from '@angular/common';
 import { HousingLocationComponent } from '../housing-location/housing-location.component';
@@ -8,17 +9,23 @@ import { Housinglocation } from '../housinglocation';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [HousingLocationComponent, CommonModule],
+  imports: [HousingLocationComponent, CommonModule, ReactiveFormsModule],
   template: `
     <section>
       <form>
-        <input type="text" placeholder="Filter by city" />
-        <button class="primary" type="button">Search</button>
+        <input type="text" placeholder="Filter by city" #query />
+        <button
+          class="primary"
+          type="button"
+          (click)="filterLocations(query.value)"
+        >
+          Search
+        </button>
       </form>
     </section>
     <section class="results">
       <app-housing-location
-        *ngFor="let housingLocation of housingLocationList"
+        *ngFor="let housingLocation of filteredLocationList"
         [housingLocation]="housingLocation"
       ></app-housing-location>
     </section>
@@ -27,9 +34,25 @@ import { Housinglocation } from '../housinglocation';
 })
 export class HomeComponent {
   housingService = inject(HousingService);
-  housingLocationList: Housinglocation[] = [];
+  // housingLocationList: Housinglocation[] = [];
+  filteredLocationList: Housinglocation[] = [];
+
+  applyForm = new FormGroup({
+    query: new FormControl(''),
+  });
 
   constructor() {
-    this.housingLocationList = this.housingService.getAllHousingLocations();
+    this.filteredLocationList = this.housingService.getAllHousingLocations();
+  }
+
+  filterLocations(query: string) {
+    console.log('filter', this.applyForm);
+    if (!query?.trim()) return;
+
+    // const query = this.applyForm.value.query;
+    console.log({ query: query });
+
+    this.filteredLocationList =
+      this.housingService.filterHousingLocations(query);
   }
 }

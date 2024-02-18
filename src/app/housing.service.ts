@@ -124,6 +124,17 @@ export class HousingService {
     );
   }
 
+  filterHousingLocations(query: string): Housinglocation[] {
+    return this.housingLocationList.filter((housingLocation) => {
+      query = query.toLowerCase();
+      return (
+        housingLocation.city?.toLowerCase().includes(query) ||
+        housingLocation.state?.toLowerCase().includes(query) ||
+        housingLocation.name?.toLowerCase().includes(query)
+      );
+    });
+  }
+
   submitApplication(firstName: string, lastName: string, email: string) {
     console.log(
       `Homes application received: firstName: ${firstName}, lastName: ${lastName}, email: ${email}.`
